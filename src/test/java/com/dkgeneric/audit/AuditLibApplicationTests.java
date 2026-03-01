@@ -22,21 +22,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import com.dkgeneric.commons.config.GitInformations;
-import com.davita.ecm.p8.content.common.ServiceException;
-import com.davita.ecm.p8.content.model.P8ContentObjectAuditInfo;
-import com.davita.ecm.p8.content.model.P8ObjectAuditInfo;
-import com.davita.ecm.p8.content.model.PropertyAuditInfo;
-import com.davita.ecm.p8.content.resources.P8ContentResource;
-import com.davita.ecm.p8.content.response.CreateDocumentResponse;
-import com.davita.ecm.p8.content.response.GetContentResponse;
-import com.davita.ecm.p8.content.response.UpdateDocumentMetadataResponse;
 import com.dkgeneric.audit.common.P8ContentLibConverter;
 import com.dkgeneric.audit.model.EcmAuditEntry;
 import com.dkgeneric.audit.model.EcmEventType;
 import com.dkgeneric.audit.model.RequestStatus;
 import com.dkgeneric.audit.service.EcmAuditService;
 import com.dkgeneric.audit.service.P8OperationsAuditService;
+import com.dkgeneric.commons.config.GitInformations;
+import com.dkgeneric.filenet.content.common.ServiceException;
+import com.dkgeneric.filenet.content.model.P8ContentObjectAuditInfo;
+import com.dkgeneric.filenet.content.model.P8ObjectAuditInfo;
+import com.dkgeneric.filenet.content.model.PropertyAuditInfo;
+import com.dkgeneric.filenet.content.resources.P8ContentResource;
+import com.dkgeneric.filenet.content.response.CreateDocumentResponse;
+import com.dkgeneric.filenet.content.response.GetContentResponse;
+import com.dkgeneric.filenet.content.response.UpdateDocumentMetadataResponse;
 import com.dkgeneric.jpa.taxonomy.audit.model.P8OperationAuditLog;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
@@ -62,19 +62,19 @@ class AuditLibApplicationTests {
 	private P8ContentLibConverter contentLibConverter;
 	@Autowired
 	private GitInformations gitInformations;
-	
+
 	@Test
 	@Order(5)
 	void baseAuditTest() throws JsonProcessingException {
 		log.info("Base audit started");
 		Map<String, Object> eventDetails = new HashMap<>();
 		eventDetails.put("requestparameter1", "param1TestValue");
-		eventDetails.put("jsonparameter1", new P8OperationAuditLog("sample id", "sample event", "data",null));
-		EcmAuditEntry auditEntry = new EcmAuditEntry("test_app_event", EcmEventType.NOTSET,eventDetails,
-				 "test_user", "test_service_account", new Date(), "{test_object_id}",
-				RequestStatus.COMPLETED, "",UUID.randomUUID().toString(), 0);
+		eventDetails.put("jsonparameter1", new P8OperationAuditLog("sample id", "sample event", "data", null));
+		EcmAuditEntry auditEntry = new EcmAuditEntry("test_app_event", EcmEventType.NOTSET, eventDetails, "test_user",
+				"test_service_account", new Date(), "{test_object_id}", RequestStatus.COMPLETED, "",
+				UUID.randomUUID().toString(), 0);
 		baseAuditService.insertAuditRecord(auditEntry);
-		log.info("Base audit created a record with id {}",auditEntry.getDbRecordId());
+		log.info("Base audit created a record with id {}", auditEntry.getDbRecordId());
 		assertTrue(auditEntry.getDbRecordId() > 0, "Create base audit record failed. record id <= 0.");
 	}
 
@@ -85,6 +85,7 @@ class AuditLibApplicationTests {
 		result.setSize(12345);
 		return result;
 	}
+
 	@BeforeAll
 	void initialize() throws ServiceException {
 		((ch.qos.logback.classic.Logger) LoggerFactory.getLogger("com.davita.ecm.p8.content")).setLevel(LIB_LOG_LEVEL);

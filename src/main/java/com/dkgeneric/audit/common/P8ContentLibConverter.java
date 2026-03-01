@@ -11,15 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.dkgeneric.commons.config.LibConfig;
-import com.davita.ecm.p8.content.model.P8ContentObjectAuditInfo;
-import com.davita.ecm.p8.content.model.P8ObjectAuditInfo;
-import com.davita.ecm.p8.content.model.PropertyAuditInfo;
-import com.davita.ecm.p8.content.resources.P8ContentResource;
-import com.davita.ecm.p8.content.response.CreateDocumentResponse;
-import com.davita.ecm.p8.content.response.CreateDocumentVersionResponse;
-import com.davita.ecm.p8.content.response.GetContentResponse;
-import com.davita.ecm.p8.content.response.UpdateDocumentMetadataResponse;
-import com.davita.jpa.ecmaudit.kafka.model.KafkaOperationAuditLog;
+import com.dkgeneric.filenet.content.model.P8ContentObjectAuditInfo;
+import com.dkgeneric.filenet.content.model.P8ObjectAuditInfo;
+import com.dkgeneric.filenet.content.model.PropertyAuditInfo;
+import com.dkgeneric.filenet.content.response.CreateDocumentResponse;
+import com.dkgeneric.filenet.content.response.CreateDocumentVersionResponse;
+import com.dkgeneric.filenet.content.response.GetContentResponse;
+import com.dkgeneric.filenet.content.response.UpdateDocumentMetadataResponse;
 import com.dkgeneric.jpa.taxonomy.audit.model.P8OperationAuditLog;
 
 import lombok.NoArgsConstructor;
@@ -41,7 +39,8 @@ public class P8ContentLibConverter {
 	 * @param sb the string builder to whic resource information will be added
 	 * @param contentResource the content resource
 	 */
-	private void appendResourceInfo(StringBuilder sb, P8ContentResource contentResource) {
+	private void appendResourceInfo(StringBuilder sb,
+			com.dkgeneric.filenet.content.resources.P8ContentResource contentResource) {
 		if (sb != null && contentResource != null) {
 			sb.append(AuditConstants.RESOURCE_FILE_TXT).append(contentResource.getFileName())
 					.append(AuditConstants.CRLF_TXT).append(AuditConstants.RESOURCE_SIZE_TXT)
@@ -171,13 +170,4 @@ public class P8ContentLibConverter {
 				: value.toString();
 	}
 
-	public KafkaOperationAuditLog convertKafka(CreateDocumentResponse response) {
-		if (response.getAuditInfo() == null)
-			return null;
-		P8ObjectAuditInfo auditInfo = response.getAuditInfo();
-		KafkaOperationAuditLog result = new KafkaOperationAuditLog();
-		result.setObjectId(response.getP8DocumentId());
-		result.setEventTime(auditInfo.getEventTime());
-		return result;
-	}
 }
