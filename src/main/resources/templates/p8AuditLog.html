@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<title>Show current export status info</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<style>
+.tcell {
+	border-width: 0px 1px 0px 1px;
+	border-style: solid;
+	border-color: black;
+	padding: 3px 5px 3px 5px;
+}
+
+.tcell1 {
+	border-width: 0px 0px 0px 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+.header {
+	font-size: 16px;
+	font-weight: bold;
+	padding: 3px 5px 3px 5px;
+}
+
+.trow {
+	font-size: 14px;
+	border-width: 0px 0px 1px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+.trow1 {
+	font-size: 14px;
+	border-width: 1px 0px 1px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.toolbar {
+	white-space: nowrap;
+	padding: 0px 5px 20px 5px;
+}
+
+.invisible {
+	display: none;
+}
+
+.minimized {
+	width: 1%;
+}
+
+.emptymessage {
+	width: 100%;
+	margin-top: 20px;
+	text-align: center;
+}
+
+.historytable {
+	border-spacing: 0px;
+	border-collapse: collapse;
+	width: 100%;
+	margin-top: 20px;
+}
+
+.detailscontainer {
+	display: none;
+	width: 90%;
+	text-align: center;
+	grid-template-columns: 100%;
+	z-index: 10000;
+	position: fixed;
+	top: 10px;
+	padding: 5px;
+	border-width: thin;
+	border-color: black;
+	border-style: solid;
+	background-color: #EEEEEE;
+	height: 650px;
+	resize: both;
+	overflow: auto;
+	flex-direction: column;
+}
+
+.textvalue {
+	text-align: left;
+}
+
+.numericvalue {
+	text-align: right;
+}
+
+.datevalue, .buttonvalue {
+	text-align: center;
+}
+</style>
+<script>
+	function fiterTypeChanged(){
+		console.log($('#filterType').val());
+		switch($('#filterType').val()){
+		case 'error':
+		case 'all':
+			$('#filterValue').hide();
+		break;
+		default:
+			$('#filterValue').show();
+		}
+	}
+	function showDetails(btn) {
+		var container = $('#TextContainer');
+		container.css("display","flex");
+		var text = btn.parentNode.firstChild.innerText;
+		var left = (window.innerWidth - container.width()) / 2;
+		var top = (window.innerHeight - container.height()) / 2;
+		container.css("left", left + "px");
+		container.css("top", top + "px");
+		try {
+			var v = JSON.parse(text);
+			text = JSON.stringify(v, null, 4);
+		} catch (err) {
+		}
+		$("#TextContent").val(text);
+	}
+	$( document ).ready(function() {	fiterTypeChanged();document.body.addEventListener('keydown', function(event) {
+		  if (event.key === "Escape" || event.key === "Esc") {
+			  $('#TextContainer').hide();
+		  }
+		});
+	});
+</script>
+
+</head>
+<body>
+
+	<div style="width: 100%; text-align: center;" th:if="${!#strings.isEmpty(auditTable)}">
+		Audit Table: <span style="font-weight: bold;" th:text="${auditTable}"></span>
+	</div>
+	<div style="width: 100%; text-align: center;" th:if="${!#strings.isEmpty(errorText)}">
+		Error: <span style="color: red;" th:text="${errorText}"></span>
+	</div>
+	<div th:if="${logEntries.empty}" class="header emptymessage">No audit records</div>
+	<table id="AuditRecords" class="historytable" th:if="${!logEntries.empty}">
+		<caption id="RequestCaption" class="header">Audit records</caption>
+		<thead>
+			<tr class="trow1">
+				<th class="tcell nowrap minimized" scope="col">Id</th>
+				<th class="tcell nowrap minimized" scope="col">App Event</th>
+				<th class="tcell nowrap minimized" scope="col">ECM Event</th>
+				<th class="tcell nowrap minimized" scope="col">Object Id</th>
+				<th class="tcell nowrap minimized" scope="col">Status</th>
+				<th class="tcell nowrap minimized" scope="col">Event time</th>
+				<th class="tcell nowrap minimized" scope="col">Response time(ms)</th>
+				<th class="tcell nowrap minimized" scope="col">Event details</th>
+				<th class="tcell nowrap minimized" scope="col">Error Details</th>
+				<th class="tcell nowrap minimized" scope="col">Error Id</th>
+				<th class="tcell nowrap minimized" scope="col">App user</th>
+				<th class="tcell nowrap minimized" scope="col">App svc account</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="trow" th:each="entry : ${logEntries}">
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ID')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_EVENT')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ECM_EVENT')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('OBJECT_ID')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('REQUEST_STATUS')}"> </span></td>
+				<td class="tcell datevalue nowrap" style="text-align: center;"><span
+					th:text="${#dates.format(entry.get('EVENT_TIME'),'MM/dd/yyyy HH:mm:ss')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('responseTime')}"> </span></td>
+				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('ECM_EVENT_DETAILS')}"> </span>
+					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('ECM_EVENT_DETAILS'))}">Show</button>
+					<span th:if="${#strings.isEmpty(entry.get('ECM_EVENT_DETAILS'))}">N/A</span></td>
+				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('ERROR_DETAILS')}"> </span>
+					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('ERROR_DETAILS'))}">Show</button></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ERROR_ID')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_USER')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_SVC_ACCOUNT')}"> </span></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div style="width: 100%; justify-content: center; margin-top: 20px; display: flex;">
+		<form style="text-align: center;">
+			<div
+				style="display: grid; grid-template-columns: 70% 60px; text-align: left; column-gap: 10px; row-gap: 10px; padding-bottom: 10px;">
+				<div>Last records count</div>
+				<div>
+					<input type="text" name="offset" th:value="${offset}" style="width: 50px;">
+				</div>
+				<div>
+					<select id="filterType" name="filterType" onchange="fiterTypeChanged()">
+						<option th:each="item : ${filterOptions}" th:value="${item.value}" th:text="${item.name}"
+							th:selected="${item.selected}"></option>
+					</select>
+				</div>
+				<div>
+					<input id="filterValue" type="text" name="filterValue" th:value="${filterValue}">
+				</div>
+			</div>
+			<button type="submit" onclick="window.location.reload();">Refresh</button>
+		</form>
+	</div>
+
+	<div id="TextContainer" class="detailscontainer">
+		<textarea id="TextContent" style="resize: none; flex: 1;"></textarea>
+		<div style="text-align: center; margin-top: 5px;">
+			<button type="button" onclick="$('#TextContainer').hide()">Hide</button>
+		</div>
+	</div>
+</body>
+</html>
