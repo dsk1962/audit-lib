@@ -14,21 +14,22 @@ import com.dkgeneric.commons.config.LibConfig;
 import com.dkgeneric.filenet.content.model.P8ContentObjectAuditInfo;
 import com.dkgeneric.filenet.content.model.P8ObjectAuditInfo;
 import com.dkgeneric.filenet.content.model.PropertyAuditInfo;
+import com.dkgeneric.filenet.content.resources.P8ContentResource;
 import com.dkgeneric.filenet.content.response.CreateDocumentResponse;
 import com.dkgeneric.filenet.content.response.CreateDocumentVersionResponse;
 import com.dkgeneric.filenet.content.response.GetContentResponse;
 import com.dkgeneric.filenet.content.response.UpdateDocumentMetadataResponse;
-import com.dkgeneric.jpa.taxonomy.audit.model.P8OperationAuditLog;
+import com.dkgeneric.jpa.audit.repository.model.FilenetOperationAuditLog;
 
 import lombok.NoArgsConstructor;
 
 /**
  * The Class P8ContentLibConverter. Use this class to convert p8-content-lib specific audit information to auditable data
  */
-@Component("P8ContentLibConverter")
+@Component("filenetContentLibConverter")
 @NoArgsConstructor
 @Lazy
-public class P8ContentLibConverter {
+public class FilenetContentLibConverter {
 
 	/** The date format. */
 	private DateTimeFormatter dateFormat = DateTimeFormatter.ISO_INSTANT;
@@ -39,8 +40,7 @@ public class P8ContentLibConverter {
 	 * @param sb the string builder to whic resource information will be added
 	 * @param contentResource the content resource
 	 */
-	private void appendResourceInfo(StringBuilder sb,
-			com.dkgeneric.filenet.content.resources.P8ContentResource contentResource) {
+	private void appendResourceInfo(StringBuilder sb, P8ContentResource contentResource) {
 		if (sb != null && contentResource != null) {
 			sb.append(AuditConstants.RESOURCE_FILE_TXT).append(contentResource.getFileName())
 					.append(AuditConstants.CRLF_TXT).append(AuditConstants.RESOURCE_SIZE_TXT)
@@ -55,11 +55,11 @@ public class P8ContentLibConverter {
 	 * @param response the create document response
 	 * @return the p8 operation audit log instance
 	 */
-	public P8OperationAuditLog convert(CreateDocumentResponse response) {
+	public FilenetOperationAuditLog convert(CreateDocumentResponse response) {
 		if (response.getAuditInfo() == null)
 			return null;
 		P8ObjectAuditInfo auditInfo = response.getAuditInfo();
-		P8OperationAuditLog result = new P8OperationAuditLog();
+		FilenetOperationAuditLog result = new FilenetOperationAuditLog();
 		result.setDocumentId(auditInfo.getObjectId());
 		if (response instanceof CreateDocumentVersionResponse)
 			result.setEcmEvent(AuditConstants.DOCUMENT_VERSION_CREATE_EVENT);
@@ -90,10 +90,10 @@ public class P8ContentLibConverter {
 	 * @param response the get document content response
 	 * @return the p8 operation audit log instance
 	 */
-	public P8OperationAuditLog convert(GetContentResponse response) {
+	public FilenetOperationAuditLog convert(GetContentResponse response) {
 		if (response.getAuditInfo() != null) {
 			P8ObjectAuditInfo auditInfo = response.getAuditInfo();
-			P8OperationAuditLog result = new P8OperationAuditLog();
+			FilenetOperationAuditLog result = new FilenetOperationAuditLog();
 			result.setEcmEvent(AuditConstants.DOCUMENT_DOWNLOAD_EVENT);
 			result.setDocumentId(auditInfo.getObjectId());
 			StringBuilder sb = getEventDetailsBuilder(auditInfo);
@@ -122,11 +122,11 @@ public class P8ContentLibConverter {
 	 * @param response the document update response
 	 * @return the list of p8 operation audit log instances
 	 */
-	public List<P8OperationAuditLog> convert(UpdateDocumentMetadataResponse response) {
-		ArrayList<P8OperationAuditLog> results = new ArrayList<>();
+	public List<FilenetOperationAuditLog> convert(UpdateDocumentMetadataResponse response) {
+		ArrayList<FilenetOperationAuditLog> results = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(response.getAuditInfos())) {
 			for (P8ObjectAuditInfo auditInfo : response.getAuditInfos()) {
-				P8OperationAuditLog result = new P8OperationAuditLog();
+				FilenetOperationAuditLog result = new FilenetOperationAuditLog();
 				result.setDocumentId(auditInfo.getObjectId());
 				result.setEcmEvent(AuditConstants.DOCUMENT_UPDATE_EVENT);
 				StringBuilder sb = getEventDetailsBuilder(auditInfo);

@@ -7,14 +7,14 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.dkgeneric.commons.controller.BaseWebService;
 import com.dkgeneric.audit.model.RequestParameter;
 import com.dkgeneric.audit.model.WebServiceRequestAuditEntry;
+import com.dkgeneric.commons.controller.BaseWebService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @Component("p8auditlibWebServiceServletRequestAuditService")
-@DependsOn("AppJsonConfigurationService")
+@DependsOn("appJsonConfigurationService")
 @Lazy
 public class WebServiceServletRequestAuditService extends EcmAuditService {
 

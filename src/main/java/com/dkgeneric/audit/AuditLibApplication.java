@@ -3,7 +3,7 @@ package com.dkgeneric.audit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = { "com.davita.ecm.*" })
+@SpringBootApplication(scanBasePackages = { "com.dkgeneric.*" })
 public class AuditLibApplication {
 
 	public static void main(String[] args) {

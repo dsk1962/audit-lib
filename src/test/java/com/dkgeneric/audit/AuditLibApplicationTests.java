@@ -22,12 +22,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import com.dkgeneric.audit.common.P8ContentLibConverter;
+import com.dkgeneric.audit.common.FilenetContentLibConverter;
 import com.dkgeneric.audit.model.EcmAuditEntry;
 import com.dkgeneric.audit.model.EcmEventType;
 import com.dkgeneric.audit.model.RequestStatus;
 import com.dkgeneric.audit.service.EcmAuditService;
-import com.dkgeneric.audit.service.P8OperationsAuditService;
+import com.dkgeneric.audit.service.FilenetOperationsAuditService;
 import com.dkgeneric.commons.config.GitInformations;
 import com.dkgeneric.filenet.content.common.ServiceException;
 import com.dkgeneric.filenet.content.model.P8ContentObjectAuditInfo;
@@ -37,29 +37,28 @@ import com.dkgeneric.filenet.content.resources.P8ContentResource;
 import com.dkgeneric.filenet.content.response.CreateDocumentResponse;
 import com.dkgeneric.filenet.content.response.GetContentResponse;
 import com.dkgeneric.filenet.content.response.UpdateDocumentMetadataResponse;
-import com.dkgeneric.jpa.taxonomy.audit.model.P8OperationAuditLog;
+import com.dkgeneric.jpa.audit.repository.model.FilenetOperationAuditLog;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 
 import ch.qos.logback.classic.Level;
 import lombok.extern.slf4j.Slf4j;
 
+@SpringBootTest
 @TestPropertySource(locations = "classpath:/application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @EnableEncryptableProperties
 @Slf4j
-@SpringBootTest
 class AuditLibApplicationTests {
 	static final Level LIB_LOG_LEVEL = Level.DEBUG;
 	@Autowired
-	private P8OperationsAuditService auditService;
+	private FilenetOperationsAuditService auditService;
 	@Autowired
-	@Qualifier("p8auditlibEcmAuditService")
+	@Qualifier("auditlibAuditService")
 	private EcmAuditService baseAuditService;
 	@Autowired
-	@Qualifier("P8ContentLibConverter")
-	private P8ContentLibConverter contentLibConverter;
+	private FilenetContentLibConverter contentLibConverter;
 	@Autowired
 	private GitInformations gitInformations;
 
@@ -69,7 +68,7 @@ class AuditLibApplicationTests {
 		log.info("Base audit started");
 		Map<String, Object> eventDetails = new HashMap<>();
 		eventDetails.put("requestparameter1", "param1TestValue");
-		eventDetails.put("jsonparameter1", new P8OperationAuditLog("sample id", "sample event", "data", null));
+		eventDetails.put("jsonparameter1", new FilenetOperationAuditLog("sample id", "sample event", "data", null));
 		EcmAuditEntry auditEntry = new EcmAuditEntry("test_app_event", EcmEventType.NOTSET, eventDetails, "test_user",
 				"test_service_account", new Date(), "{test_object_id}", RequestStatus.COMPLETED, "",
 				UUID.randomUUID().toString(), 0);
@@ -108,7 +107,7 @@ class AuditLibApplicationTests {
 		auditInfo.addPropertyAuditInfo(
 				new PropertyAuditInfo("DateLastModified", null, new Date(new Date().getTime() - 20 * 60 * 1000)));
 		auditInfo.setContentResource(createContentResource());
-		P8OperationAuditLog entry = contentLibConverter.convert(response);
+		FilenetOperationAuditLog entry = contentLibConverter.convert(response);
 		auditService.addP8OperationAuditRecord(setAppData(entry));
 		assertTrue(entry.getId() > 0, "Create audit record failed. record id <= 0.");
 	}
@@ -123,7 +122,7 @@ class AuditLibApplicationTests {
 		auditInfo.setObjectClass("Document");
 		auditInfo.setObjectId("{80B5AA6F-0000-CE16-8583-101C09C2ECAE}");
 		auditInfo.setContentResource(createContentResource());
-		P8OperationAuditLog entry = contentLibConverter.convert(response);
+		FilenetOperationAuditLog entry = contentLibConverter.convert(response);
 		auditService.addP8OperationAuditRecord(setAppData(entry));
 		assertTrue(entry.getId() > 0, "Create audit record failed. record id <= 0.");
 	}
@@ -142,7 +141,7 @@ class AuditLibApplicationTests {
 		auditInfo.addPropertyAuditInfo(new PropertyAuditInfo("DocumentTitle", "Document Title", "New Document Title"));
 		auditInfo.addPropertyAuditInfo(
 				new PropertyAuditInfo("DateLastModified", new Date(new Date().getTime() - 20 * 60 * 1000), new Date()));
-		List<P8OperationAuditLog> entry = contentLibConverter.convert(response);
+		List<FilenetOperationAuditLog> entry = contentLibConverter.convert(response);
 		auditService.addP8OperationAuditRecord(setAppData(entry.get(0)));
 		assertTrue(entry.get(0).getId() > 0, "Create audit record failed. record id <= 0.");
 	}
@@ -158,12 +157,12 @@ class AuditLibApplicationTests {
 		response.setAuditInfos(auditInfos);
 		auditInfo.setObjectClass("Document");
 		auditInfo.setObjectId("{80B5AA6F-0000-CE16-8583-101C09C2ECAE}");
-		List<P8OperationAuditLog> entry = contentLibConverter.convert(response);
+		List<FilenetOperationAuditLog> entry = contentLibConverter.convert(response);
 		auditService.addP8OperationAuditRecord(setAppData(entry.get(0)));
 		assertTrue(entry.get(0).getId() > 0, "Create audit record failed. record id <= 0.");
 	}
 
-	private P8OperationAuditLog setAppData(P8OperationAuditLog auditInfo) {
+	private FilenetOperationAuditLog setAppData(FilenetOperationAuditLog auditInfo) {
 		auditInfo.setAppEvent("Audit Lib unit test");
 		auditInfo.setAppId("Audit Lib Project");
 		auditInfo.setAppUser("Unit Test");

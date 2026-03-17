@@ -5,8 +5,8 @@ import java.io.StringWriter;
 
 import org.springframework.util.StringUtils;
 
-import com.dkgeneric.commons.model.ErrorLogEntry;
 import com.dkgeneric.audit.model.EcmAuditEntry;
+import com.dkgeneric.commons.model.ErrorLogEntry;
 
 public class AuditUtils {
 

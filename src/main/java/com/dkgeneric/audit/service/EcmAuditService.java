@@ -17,14 +17,14 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.dkgeneric.commons.common.CommonsUtil;
-import com.dkgeneric.commons.config.LibConfig;
-import com.dkgeneric.commons.service.AppJsonConfigurationService;
 import com.dkgeneric.audit.model.EcmAuditConfiguration;
 import com.dkgeneric.audit.model.EcmAuditEntry;
 import com.dkgeneric.audit.model.EcmEventType;
 import com.dkgeneric.audit.model.RequestStatus;
 import com.dkgeneric.audit.model.WebServiceRequestAuditEntry;
+import com.dkgeneric.commons.common.CommonsUtil;
+import com.dkgeneric.commons.config.LibConfig;
+import com.dkgeneric.commons.service.AppJsonConfigurationService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,24 +34,25 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-@Component("p8auditlibEcmAuditService")
-@DependsOn("AppJsonConfigurationService")
+@Component("auditlibAuditService")
+@DependsOn("appJsonConfigurationService")
 @Lazy
 @Slf4j
 public class EcmAuditService {
 
+
 	public static final String AUDIT_CONFIGURATION_ENTRY = "auditCfg";
-	private static final String JSON_KEY = "ecmAuditConfiguration";
-	public static final String APP_EVENT_COLUMN = "APP_EVENT";
-	public static final String APP_USER_COLUMN = "APP_USER";
-	public static final String APP_SVC_ACCOUNT_COLUMN = "APP_SVC_ACCOUNT";
-	public static final String OBJECT_ID_COLUMN = "OBJECT_ID";
-	public static final String ECM_EVENT_DETAILS_COLUMN = "ECM_EVENT_DETAILS";
-	public static final String EVENT_TIME_COLUMN = "EVENT_TIME";
-	public static final String ECM_EVENT_COLUMN = "ECM_EVENT";
-	public static final String REQUEST_STATUS_COLUMN = "REQUEST_STATUS";
-	public static final String ERROR_ID_COLUMN = "ERROR_ID";
-	public static final String ERROR_DETAILS_COLUMN = "ERROR_DETAILS";
+	private static final String JSON_KEY = "auditConfiguration";
+	public static final String APP_EVENT_COLUMN = "app_event";
+	public static final String APP_USER_COLUMN = "app_user";
+	public static final String APP_SVC_ACCOUNT_COLUMN = "app_svc_account";
+	public static final String OBJECT_ID_COLUMN = "object_id";
+	public static final String ECM_EVENT_DETAILS_COLUMN = "request_details";
+	public static final String EVENT_TIME_COLUMN = "event_time";
+	public static final String ECM_EVENT_COLUMN = "filenet_event";
+	public static final String REQUEST_STATUS_COLUMN = "request_status";
+	public static final String ERROR_ID_COLUMN = "error_id";
+	public static final String ERROR_DETAILS_COLUMN = "error_details";
 	public static final String RESPONSE_TIME_KEY = "responseTime";
 	public static final String REQUEST_INFO_KEY = "requestInfo";
 	public static final String REQUEST_DATA_KEY = "requestData";
@@ -71,10 +72,10 @@ public class EcmAuditService {
 	private LibConfig commonsLibConfig;
 
 	@Autowired
-	@Qualifier("ecmAuditDataSource")
-	private DataSource ecmDatacapDataSource;
+	@Qualifier("commonsAuditDataSource")
+	private DataSource commonsAuditDataSource;
 	@Autowired
-	@Qualifier("ecmAuditJdbcTemplate")
+	@Qualifier("commonsAuditJdbcTemplate")
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	@Getter
@@ -83,7 +84,7 @@ public class EcmAuditService {
 	protected ObjectMapper mapper;
 	private SimpleJdbcInsert simpleJdbcInsert;
 
-	private static final String SELECT_LATEST_AUDIT_RECORDS = "SELECT * FROM {} WHERE ID > (SELECT MAX(t.ID) - {} FROM {} t) {}";
+	private static final String SELECT_LATEST_AUDIT_RECORDS = "SELECT * FROM {} WHERE id > (SELECT MAX(t.id) - {} FROM {} t) {}";
 	private static final String AND_JOIN = " AND ";
 
 	public void insertAuditRecord(EcmAuditEntry entry) throws JsonProcessingException {
@@ -179,7 +180,7 @@ public class EcmAuditService {
 		if (cfg.has(JSON_KEY))
 			auditConfiguration.copyNonNullValues(mapper.convertValue(cfg.get(JSON_KEY), EcmAuditConfiguration.class));
 		if (StringUtils.hasText(auditConfiguration.getAuditTableName()))
-			simpleJdbcInsert = new SimpleJdbcInsert(ecmDatacapDataSource)
-					.withTableName(auditConfiguration.getAuditTableName()).usingGeneratedKeyColumns("ID");
+			simpleJdbcInsert = new SimpleJdbcInsert(commonsAuditDataSource)
+					.withTableName(auditConfiguration.getAuditTableName()).usingGeneratedKeyColumns("id");
 	}
 }

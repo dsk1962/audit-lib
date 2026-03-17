@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import com.dkgeneric.commons.controller.BaseWebService;
 import com.dkgeneric.audit.model.RequestParameter;
 import com.dkgeneric.audit.model.WebServiceRequestAuditEntry;
+import com.dkgeneric.commons.controller.BaseWebService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Component("p8auditlibWebServiceRequestAuditService")
-@DependsOn("AppJsonConfigurationService")
+@DependsOn("appJsonConfigurationService")
 @RequiredArgsConstructor
 @Lazy
 public class WebServiceRequestAuditService extends EcmAuditService {
