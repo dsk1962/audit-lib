@@ -164,22 +164,22 @@
 		</thead>
 		<tbody>
 			<tr class="trow" th:each="entry : ${logEntries}">
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ID')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_EVENT')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ECM_EVENT')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('OBJECT_ID')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('REQUEST_STATUS')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('id')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('app_event')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('filenet_event')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('object_id')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('request_status')}"> </span></td>
 				<td class="tcell datevalue nowrap" style="text-align: center;"><span
 					th:text="${#dates.format(entry.get('EVENT_TIME'),'MM/dd/yyyy HH:mm:ss')}"> </span></td>
 				<td class="tcell textvalue nowrap"><span th:text="${entry.get('responseTime')}"> </span></td>
-				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('ECM_EVENT_DETAILS')}"> </span>
-					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('ECM_EVENT_DETAILS'))}">Show</button>
-					<span th:if="${#strings.isEmpty(entry.get('ECM_EVENT_DETAILS'))}">N/A</span></td>
-				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('ERROR_DETAILS')}"> </span>
-					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('ERROR_DETAILS'))}">Show</button></td>
+				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('request_details')}"> </span>
+					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('request_details'))}">Show</button>
+					<span th:if="${#strings.isEmpty(entry.get('request_details'))}">N/A</span></td>
+				<td class="tcell buttonvalue"><span class="invisible" th:text="${entry.get('error_details')}"> </span>
+					<button type="button" onclick="showDetails(this)" th:if="${!#strings.isEmpty(entry.get('error_details'))}">Show</button></td>
 				<td class="tcell textvalue nowrap"><span th:text="${entry.get('ERROR_ID')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_USER')}"> </span></td>
-				<td class="tcell textvalue nowrap"><span th:text="${entry.get('APP_SVC_ACCOUNT')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('app_user')}"> </span></td>
+				<td class="tcell textvalue nowrap"><span th:text="${entry.get('app_svc_account')}"> </span></td>
 			</tr>
 		</tbody>
 	</table>

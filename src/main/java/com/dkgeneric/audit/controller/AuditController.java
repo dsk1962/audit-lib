@@ -81,7 +81,7 @@ public class AuditController {
 		filterOptions.add(new FilterOption(EcmAuditService.REQUEST_DATE_FILTER_TYPE, "Request Date",
 				filterType.equals(EcmAuditService.REQUEST_DATE_FILTER_TYPE)));
 
-		return new ModelAndView("p8AuditLog", model);
+		return new ModelAndView("serviceAuditLog", model);
 	}
 
 	private void preprocess(EcmAuditService ecmAuditService, Map<String, Object> entry) {
